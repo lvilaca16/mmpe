@@ -1,10 +1,12 @@
 from .fourier import FourierPE
+from .mrope import MRoPE
 from .rope import RoPE
 
-SUPPORT_TYPES = ["rope", "fourier"]
+SUPPORT_TYPES = ["rope", "mrope", "fourier"]
 
 _ENCODING_REGISTRY = {
     "fourier": FourierPE,
+    "mrope": MRoPE,
     "rope": RoPE,
 }
 
