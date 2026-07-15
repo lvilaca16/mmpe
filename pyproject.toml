@@ -10,16 +10,24 @@ readme = "README.md"
 license = { text = "CC-BY-NC-SA-4.0" }
 requires-python = ">=3.9"
 dependencies = [
+    "black",
+    "calflops",
+    "einops",
+    "flake8",
+    "isort",
+    "matplotlib",
+    "numpy",
+    "pillow",
     "torch",
     "torchaudio",
+    "torchcodec",
+    "torchinfo",
     "torchvision",
-    "einops",
-    "numpy",
-    "Pillow",
+    "tqdm",
+    "transformers",
+    "typer",
+    "wandb"
 ]
-
-[project.optional-dependencies]
-dev = []
 
 [tool.setuptools.packages.find]
 where = ["src"]
