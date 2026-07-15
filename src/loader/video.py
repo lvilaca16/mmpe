@@ -4,6 +4,7 @@ from dataclasses import dataclass, field, replace
 from glob import glob
 from pathlib import Path
 from typing import List, Optional, Tuple
+import functools
 
 import numpy as np
 import torch
@@ -59,11 +60,8 @@ class VideoDataset(torch.utils.data.Dataset):
 
         # video properties
         assert len(self.video.downsample) == 3, "invalid downsample config."
-        # self.dt, self.dh, self.dw = self.video.downsample
 
-        bypass = Lambda(lambda x: x)  # helper transform
-
-        # self.resolution = self.video.resolution
+        bypass = Lambda(_identity)  # helper transform
 
         # increase by 10%
         resize_shape = (
@@ -78,25 +76,26 @@ class VideoDataset(torch.utils.data.Dataset):
                 CenterCrop(self.video.resolution),
                 Normalize(mean=MEAN, std=STD),
                 Lambda(
-                    lambda x: rearrange(
-                        x,
-                        "(t dt) c (h dh) (w dw) -> t (dt dh dw) c h w",
+                    functools.partial(
+                        _rearrange_downsample,
                         dt=self.video.downsample[0],
                         dh=self.video.downsample[1],
                         dw=self.video.downsample[2],
                     )
                 ),
                 (
-                    Lambda(lambda x: video_hflip(x, p=0.5))
+                    Lambda(functools.partial(_hflip, p=0.5))
                     if split == "train"
                     else bypass
                 ),
                 (
-                    Lambda(lambda x: video_dropout(x, p=0.2))
+                    Lambda(functools.partial(_dropout, p=0.2))
                     if split == "train"
                     else bypass
                 ),
-        
+                Lambda(_rearrange_final),
+            ]
+        )
 
         super().__init__()
 
@@ -159,3 +158,29 @@ def get_video(path: Path, n_frames: int = 32) -> torch.Tensor:
     frames = torch.from_numpy(frames).permute(0, 3, 1, 2)  # channels first
 
     return frames
+
+
+def _identity(x):
+    return x
+
+
+def _rearrange_downsample(x, dt, dh, dw):
+    return rearrange(
+        x,
+        "(t dt) c (h dh) (w dw) -> t (dt dh dw) c h w",
+        dt=dt,
+        dh=dh,
+        dw=dw,
+    )
+
+
+def _hflip(x, p):
+    return video_hflip(x, p=p)
+
+
+def _dropout(x, p):
+    return video_dropout(x, p=p)
+
+
+def _rearrange_final(x):
+    return rearrange(x, "t p c h w -> t h w (c p)")
