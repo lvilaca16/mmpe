@@ -63,20 +63,6 @@ def main(args: argparse.Namespace, config: dict) -> None:
     # Get model ----------------------------------------------------------
     model = Model(**config["model"])
 
-    if args.profile:
-        torch.autograd.set_detect_anomaly(True)
-
-        profile_model(model, config["model"]["input_shape"], device)
-        measure_throughput(model, config["model"]["input_shape"], device)
-        exit(0)
-
-    if args.verbose:
-        dummy_inputs = torch.rand(config["model"]["input_shape"])
-        summary(model, input_data=dummy_inputs)
-
-        flops, macs = calculate_flops(model, dummy_inputs)
-        print(f"Model FLOPs: {flops}, MACs: {macs}")
-
     # Optimizer ----------------------------------------------------------
     if args.opt_name == "sgd":
         optimizer = SGD(
@@ -121,6 +107,22 @@ def main(args: argparse.Namespace, config: dict) -> None:
     }
 
     best_val_loss = np.inf
+
+    if args.profile:
+        torch.autograd.set_detect_anomaly(True)
+
+        shape = (1, *t_dataset.output_shape())
+
+        profile_model(model, shape, device)
+        measure_throughput(model, shape, device)
+        exit(0)
+
+    if args.verbose:
+        dummy_inputs = torch.rand(1, *t_dataset.output_shape())
+        summary(model, input_data=dummy_inputs)
+
+        flops, macs = calculate_flops(model, dummy_inputs)
+        print(f"Model FLOPs: {flops}, MACs: {macs}")
 
     model.to(device)
 
