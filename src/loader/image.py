@@ -46,7 +46,8 @@ class ImageDataset(torch.utils.data.Dataset):
         # Replace dataclass instead of mutating (in-place)
         self.image = replace(image, **overrides)
 
-        path = path / f"{split}"
+        path = Path(path) / f"{split}"
+        assert path.exists(), "Invalid filepath"
 
         # labels are the folders on the first level
         self.files = glob(str(path / "**/*"))
