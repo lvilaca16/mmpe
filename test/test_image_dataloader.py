@@ -7,14 +7,14 @@ from tqdm import tqdm
 
 from src.loader import get_dataset, ImageDataset
 
-DATA_PATH = Path("data/cifar100")
+DATA_PATH = Path("data/image")
 RESOLUTION = 224
 
 
 class TestImageFolder(unittest.TestCase):
 
     def setUp(self):
-        kwargs = {"path": DATA_PATH, "split": "train", "resolution": RESOLUTION}
+        kwargs = {"path": DATA_PATH, "split": "test", "resolution": RESOLUTION}
         self.dataset = get_dataset("image", **kwargs)
 
     def test_non_empty_dataset(self):
@@ -33,7 +33,7 @@ class TestImageFolder(unittest.TestCase):
     def test_channels_last_toggle(self):
         dataset = ImageDataset(
             DATA_PATH,
-            split="train",
+            split="test",
             resolution=RESOLUTION,
             channels_last=False,
         )
