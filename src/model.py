@@ -1,5 +1,5 @@
 import math
-from typing import Literal, Optional
+from typing import Literal, Optional, List
 
 import torch
 import torch.autograd.profiler as profiler
@@ -105,12 +105,16 @@ class Model(nn.Module):
         dim_kv: int,
         n_classes: int = 16,
         n_heads: int = 4,
+        input_shape: List[int] = [1, 224, 224, 3],
         pe_type: Literal["rope", "mrope", "mrope_i", "fourier"] = "rope",
         **kwargs,
     ):
         super().__init__()
 
         self.latent_query = nn.Parameter(torch.randn(1, dim_q))
+
+        # Configure resampling according to input shape
+        _, *axes, dim = input_shape
         self.att = Attention(dim_q, dim_kv, n_heads, pe_type, **kwargs)
 
         # Classifier head
