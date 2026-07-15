@@ -54,7 +54,7 @@ class VideoDataset(torch.utils.data.Dataset):
         self.video = replace(video, **video_overrides)
         self.audio = replace(audio, **audio_overrides)
 
-        path = path / f"{split}"
+        path = Path(path) / f"{split}"
         assert path.exists(), "Invalid filepath"
 
         # labels are the folders on the first level
