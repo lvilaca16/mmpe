@@ -1,5 +1,5 @@
 import math
-from typing import Literal, Optional, List
+from typing import Optional, List
 
 import torch
 import torch.autograd.profiler as profiler
@@ -15,33 +15,10 @@ class Attention(nn.Module):
         dim_q: int,
         dim_kv: int,
         n_heads: int = 1,
-        pe_type: str = "fourier",
-        bias: Optional[float] = 1e-6,
-        eps: Optional[bool] = True,
-        **kwargs,
+        bias: Optional[bool] = True,
+        eps: Optional[float] = 1e-6,
     ):
         super().__init__()
-
-        assert (
-            pe_type in SUPPORT_TYPES
-        ), f"{pe_type} not supported ({SUPPORT_TYPES})"
-
-        # Positional Encoding
-        pe_args = {}
-
-        stack = kwargs.get("stack", None)
-        if stack:
-            pe_args["stack"] = stack
-
-        n_bands = kwargs.get("n_bands", None)
-        if n_bands:
-            pe_args["n_bands"] = n_bands
-
-        self.q_pe = get_positional_encoding(pe_type, dim=dim_q, **pe_args)
-        self.kv_pe = get_positional_encoding(pe_type, dim=dim_kv, **pe_args)
-
-        dim_q = self.q_pe.output_shape([1])[-1]
-        dim_kv = self.kv_pe.output_shape([1])[-1]
 
         if dim_q % n_heads != 0:
             raise ValueError("dim_q must be divisible by n_heads")
@@ -64,14 +41,8 @@ class Attention(nn.Module):
     ) -> torch.Tensor:
         h = self.n_heads
 
-        # [batch, tokens, pe_size]
-        with profiler.record_function("attention/positional-enc"):
-            q, kv = self.q_pe(x_q), self.kv_pe(x_kv)
-
-            # To sequence
-            kv = rearrange(kv, "b ... c -> b (...) c")
-
-        q, kv = self.norm_q(q), self.norm_kv(kv)
+        q = self.norm_q(x_q)
+        kv = self.norm_kv(x_kv)
 
         # [batch, tokens, emb_size]
         k, v = self.kv_proj(kv).chunk(2, dim=-1)
@@ -106,19 +77,45 @@ class Model(nn.Module):
         n_classes: int = 16,
         n_heads: int = 4,
         input_shape: List[int] = [1, 224, 224, 3],
-        pe_type: Literal["rope", "mrope", "mrope_i", "fourier"] = "rope",
+        pe_type: str = "rope",
         **kwargs,
     ):
         super().__init__()
 
         self.latent_query = nn.Parameter(torch.randn(1, dim_q))
 
+        assert (
+            pe_type in SUPPORT_TYPES
+        ), f"{pe_type} not supported ({SUPPORT_TYPES})"
+
+        # Positional Encoding
+        pe_args = {}
+
+        stack = kwargs.get("stack", None)
+        if stack is not None:
+            pe_args["stack"] = stack
+
+        n_bands = kwargs.get("n_bands", None)
+        if n_bands is not None:
+            pe_args["n_bands"] = n_bands
+
         # Configure resampling according to input shape
         _, *axes, dim = input_shape
-        self.att = Attention(dim_q, dim_kv, n_heads, pe_type, **kwargs)
+
+        self.channel_projection = nn.Linear(dim, dim_kv)
+
+        self.pos_enc = get_positional_encoding(pe_type, dim=dim_kv, **pe_args)
+
+        dim_pos_enc = self.pos_enc.output_shape(axes)[-1]
+
+        # Attention
+        bias = kwargs.get("bias", True)
+        eps = kwargs.get("eps", 1e-6)
+
+        self.att = Attention(dim_q, dim_pos_enc, n_heads, bias, eps)
 
         # Classifier head
-        self.to_logits = nn.Linear(self.att.dim_q, n_classes)
+        self.to_logits = nn.Linear(dim_q, n_classes)
 
         with torch.no_grad():
             # As mentioned in https://arxiv.org/abs/2103.03206
@@ -127,11 +124,20 @@ class Model(nn.Module):
     def forward(self, x_kv: torch.Tensor) -> torch.Tensor:
         b = x_kv.shape[0]
 
+        # [batch, tokens, dim_kv]
+        with profiler.record_function("attention/pre-processing"):
+            kv = self.channel_projection(x_kv)
+
+        # [batch, tokens, pe_size]
+        with profiler.record_function("attention/positional-encoding"):
+            kv = self.pos_enc(kv)
+            kv = rearrange(kv, "b ... c -> b (...) c")  # to sequence
+
         # Get Latent array
         with profiler.record_function("latent-array"):
             x_latent = repeat(self.latent_query, "n d -> b n d", b=b)
 
         with profiler.record_function("attention"):
-            x_attn = self.att(x_latent, x_kv).squeeze(dim=1)
+            x_attn = self.att(x_latent, kv).squeeze(dim=1)
 
         return self.to_logits(x_attn)
