@@ -7,7 +7,6 @@ from typing import List, Optional, Tuple
 
 import numpy as np
 import torch
-import torchaudio.transforms as T
 from einops import rearrange
 from torch.nn import functional as F
 from torchvision.transforms import (
@@ -19,7 +18,6 @@ from torchvision.transforms import (
     Resize,
 )
 
-from .audio import AudioConfig, get_audio
 from .image import MEAN, STD, get_image
 from .utils import build_label_map, video_dropout, video_hflip
 
@@ -39,20 +37,14 @@ class VideoDataset(torch.utils.data.Dataset):
         path: Path,
         split: str = "train",
         video: Optional[VideoConfig] = None,
-        audio: Optional[AudioConfig] = None,
         **kwargs,
     ):
         video = video or VideoConfig()
-        audio = audio or AudioConfig()
 
         video_overrides = {k: v for k, v in kwargs.items() if hasattr(video, k)}
-        audio_overrides = {k: v for k, v in kwargs.items() if hasattr(audio, k)}
-
-        audio_overrides["length"] = kwargs.get("length", 1)
 
         # Replace dataclass instead of mutating (in-place)
         self.video = replace(video, **video_overrides)
-        self.audio = replace(audio, **audio_overrides)
 
         path = Path(path) / f"{split}"
         assert path.exists(), "Invalid filepath"
@@ -104,33 +96,7 @@ class VideoDataset(torch.utils.data.Dataset):
                     if split == "train"
                     else bypass
                 ),
-                Lambda(lambda x: rearrange(x, "t p c h w -> t h w (c p)")),
-            ]
-        )
-
-        if self.audio.preprocessing == "spec":
-            self.a_transform = Compose(
-                [
-                    T.MelSpectrogram(
-                        sample_rate=self.audio.sr,
-                        n_fft=self.audio.n_fft,
-                        hop_length=self.audio.hop_length,
-                        n_mels=self.audio.n_mels,
-                    ),
-                    T.AmplitudeToDB(),
-                    Lambda(lambda x: rearrange(x, "c f t -> t (c f)")),
-                ]
-            )
-
-        elif self.audio.preprocessing == "raw":
-            self.a_transform = Lambda(
-                lambda x: rearrange(x, "c (t ds) -> t c ds", ds=self.audio.dim)
-            )
-
-        else:
-            raise ValueError(
-                f"Invalid audio preprocessing method ({self.audio.preprocessing})"
-            )
+        
 
         super().__init__()
 
@@ -162,16 +128,7 @@ class VideoDataset(torch.utils.data.Dataset):
         if self.v_transform is not None:
             x_video = self.v_transform(x_video)
 
-        x_audio = get_audio(
-            filepath.with_suffix(".wav"),  # mod extension to wav
-            sr=self.audio.sr,
-            max_length=self.audio.length,
-        )
-
-        if self.a_transform is not None:
-            x_audio = self.a_transform(x_audio)
-
-        return (x_audio, x_video), Y
+        return x_video, Y
 
 
 def get_video(path: Path, n_frames: int = 32) -> torch.Tensor:
