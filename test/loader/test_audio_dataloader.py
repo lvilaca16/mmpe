@@ -3,11 +3,11 @@ from pathlib import Path
 
 import torch
 from torch.utils.data import DataLoader
-from tqdm import tqdm
 
 from src.loader import get_dataset, AudioDataset
 
-DATA_PATH = Path("data/audio")
+FIXTURES = Path(__file__).parent / "fixtures" / "audio"
+
 DIM = 128
 N_MELS = 64
 
@@ -16,7 +16,7 @@ class TestAudioDatasetRaw(unittest.TestCase):
 
     def setUp(self):
         kwargs = {
-            "path": DATA_PATH,
+            "path": FIXTURES,
             "dim": DIM,
             "split": "test",
             "preprocessing": "raw",
@@ -30,7 +30,7 @@ class TestAudioDatasetRaw(unittest.TestCase):
     def test_dataloader_full_pass(self):
         loader = DataLoader(self.dataset, batch_size=1, drop_last=True)
 
-        for A, Y in tqdm(loader):
+        for A, Y in loader:
             self.assertEqual(A.shape[1:], self.dataset.output_shape())
             self.assertEqual(Y.shape[-1], 527)
 
@@ -63,7 +63,7 @@ class TestAudioDatasetSpec(unittest.TestCase):
 
     def setUp(self):
         kwargs = {
-            "path": DATA_PATH,
+            "path": FIXTURES,
             "split": "test",
             "preprocessing": "spec",
             "n_mels": N_MELS,
@@ -74,7 +74,7 @@ class TestAudioDatasetSpec(unittest.TestCase):
     def test_dataloader_full_pass(self):
         loader = DataLoader(self.dataset, batch_size=2, drop_last=True)
 
-        for A, Y in tqdm(loader):
+        for A, Y in loader:
             self.assertEqual(A.shape[-1] % N_MELS, 0)
             self.assertEqual(A.shape[1:], self.dataset.output_shape())
 
@@ -83,7 +83,7 @@ class TestAudioDatasetSpec(unittest.TestCase):
     def test_invalid_preprocessing_raises(self):
         with self.assertRaises(ValueError):
             AudioDataset(
-                DATA_PATH, split="test", preprocessing="not_a_real_mode"
+                FIXTURES, split="test", preprocessing="not_a_real_mode"
             )
 
 

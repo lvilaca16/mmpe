@@ -3,11 +3,11 @@ from pathlib import Path
 
 import torch
 from torch.utils.data import DataLoader
-from tqdm import tqdm
 
 from src.loader import get_dataset, VideoDataset
 
-DATA_PATH = Path("data/video")
+FIXTURES = Path(__file__).parent / "fixtures" / "video"
+
 RESOLUTION = 224
 PATCH_DOWNSAMPLE = [2, 8, 8]
 N_MELS = 64
@@ -17,7 +17,7 @@ class TestVideoDataset(unittest.TestCase):
 
     def setUp(self):
         kwargs = {
-            "path": DATA_PATH,
+            "path": FIXTURES,
             "split": "test",
             "resolution": RESOLUTION,
             "downsample": PATCH_DOWNSAMPLE,
@@ -31,7 +31,7 @@ class TestVideoDataset(unittest.TestCase):
     def test_dataloader_full_pass(self):
         loader = DataLoader(self.dataset, batch_size=1, drop_last=True)
 
-        for X, Y in tqdm(loader):
+        for X, Y in loader:
             dt, dh, dw = PATCH_DOWNSAMPLE
 
             self.assertEqual(X.shape[0], 1)
@@ -45,13 +45,13 @@ class TestVideoDataset(unittest.TestCase):
 
     def test_invalid_patch_downsample_raises(self):
         with self.assertRaises(AssertionError):
-            VideoDataset(DATA_PATH, downsample=[2, 8])  # only 2 values
+            VideoDataset(FIXTURES, downsample=[2, 8])  # only 2 values
 
     def test_missing_file_raises(self):
         with self.assertRaises((FileNotFoundError, IndexError)):
             # force an out-of-range access if dataset supports it; otherwise
             # this documents expected behavior for a corrupted file list
-            bad_dataset = VideoDataset(DATA_PATH, split="test")
+            bad_dataset = VideoDataset(FIXTURES, split="test")
             bad_dataset.files = ["nonexistent/path/video.mp4"]
             bad_dataset[0]
 

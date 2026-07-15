@@ -3,18 +3,18 @@ from pathlib import Path
 
 import torch
 from torch.utils.data import DataLoader
-from tqdm import tqdm
 
 from src.loader import get_dataset, ImageDataset
 
-DATA_PATH = Path("data/image")
+FIXTURES = Path(__file__).parent / "fixtures" / "image"
+
 RESOLUTION = 224
 
 
 class TestImageFolder(unittest.TestCase):
 
     def setUp(self):
-        kwargs = {"path": DATA_PATH, "split": "test", "resolution": RESOLUTION}
+        kwargs = {"path": FIXTURES, "split": "test", "resolution": RESOLUTION}
         self.dataset = get_dataset("image", **kwargs)
 
     def test_non_empty_dataset(self):
@@ -23,7 +23,7 @@ class TestImageFolder(unittest.TestCase):
     def test_dataloader_full_pass(self):
         loader = DataLoader(self.dataset, batch_size=2, drop_last=True)
 
-        for X, Y in tqdm(loader):
+        for X, Y in loader:
             # channels_last=True by default -> (B, H, W, C)
             self.assertEqual(X.shape[1:], self.dataset.output_shape())
 
@@ -32,7 +32,7 @@ class TestImageFolder(unittest.TestCase):
 
     def test_channels_last_toggle(self):
         dataset = ImageDataset(
-            DATA_PATH,
+            FIXTURES,
             split="test",
             resolution=RESOLUTION,
             channels_last=False,
