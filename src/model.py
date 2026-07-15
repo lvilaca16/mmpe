@@ -41,8 +41,9 @@ class Attention(nn.Module):
     ) -> torch.Tensor:
         h = self.n_heads
 
-        q = self.norm_q(x_q)
-        kv = self.norm_kv(x_kv)
+        # with autocast(device_type=x_q.device.type, enabled=False):
+        q = self.norm_q(x_q.type(torch.float32)).type(x_q.dtype)
+        kv = self.norm_kv(x_kv.type(torch.float32)).type(x_kv.dtype)
 
         # [batch, tokens, emb_size]
         k, v = self.kv_proj(kv).chunk(2, dim=-1)
