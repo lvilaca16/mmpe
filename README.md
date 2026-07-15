@@ -19,6 +19,26 @@ cd mropes
 pip install -e .
 ```
 
+## Testing
+
+Tests use the standard library `unittest` framework.
+
+```bash
+python -m unittest discover -s test
+```
+
+Run a specific test module:
+
+```bash
+python -m unittest test.loader.test_video
+```
+
+Run a specific test case or method:
+
+```bash
+python -m unittest test.loader.test_video.TestVideoDataset.test_output_shape
+```
+
 ## Dataloaders
 
 All datasets share a common factory interface:
