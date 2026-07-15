@@ -7,7 +7,7 @@ from tqdm import tqdm
 
 from src.loader import get_dataset, AudioDataset
 
-DATA_PATH = Path("data/audioset")
+DATA_PATH = Path("data/audio")
 DIM = 128
 N_MELS = 64
 
@@ -18,7 +18,7 @@ class TestAudioDatasetRaw(unittest.TestCase):
         kwargs = {
             "path": DATA_PATH,
             "dim": DIM,
-            "split": "train",
+            "split": "test",
             "preprocessing": "raw",
         }
 
@@ -64,7 +64,7 @@ class TestAudioDatasetSpec(unittest.TestCase):
     def setUp(self):
         kwargs = {
             "path": DATA_PATH,
-            "split": "train",
+            "split": "test",
             "preprocessing": "spec",
             "n_mels": N_MELS,
         }
@@ -82,7 +82,9 @@ class TestAudioDatasetSpec(unittest.TestCase):
 
     def test_invalid_preprocessing_raises(self):
         with self.assertRaises(ValueError):
-            AudioDataset(DATA_PATH, preprocessing="not_a_real_mode")
+            AudioDataset(
+                DATA_PATH, split="test", preprocessing="not_a_real_mode"
+            )
 
 
 if __name__ == "__main__":
