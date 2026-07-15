@@ -1,5 +1,7 @@
 # mropes
 
+[![CC BY-NC-SA 4.0][cc-by-nc-sa-shield]][cc-by-nc-sa]
+
 Dataloaders and positional encoding layers for multimodal resampling models.
 
 `mropes` provides two building blocks for multimodal resampler architectures:
