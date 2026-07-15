@@ -45,8 +45,10 @@ class AudioDataset(torch.utils.data.Dataset):
         overrides = {k: v for k, v in kwargs.items() if hasattr(audio, k)}
         self.audio = replace(audio, **overrides)
 
-        path = path / f"{split}/*{self.audio.extension}"
-        self.files = glob(path.as_posix())
+        path = Path(path) / f"{split}"
+        assert path.exists(), "Invalid filepath"
+
+        self.files = glob(str(path / f"*{self.audio.extension}"))
 
         self.n_classes = n_classes
         self.search_ext = self.audio.extension
