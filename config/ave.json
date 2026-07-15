@@ -1,0 +1,31 @@
+{
+    "batch_size": 8,
+    "clip_value": 10,
+    "num_epochs": 120,
+    "num_workers": 4,
+    "prefetch_factor": 32,
+    "seed": 1234,
+    "data": {
+        "downsample": [4, 8, 8],
+        "n_samples": 32,
+        "path": "data/ave/",
+        "resolution": 128
+    },
+    "logging": {
+        "entity": "",
+        "name": "",
+        "project": ""
+    },
+    "optim": {
+        "fused": true,
+        "lr": 1e-3
+    },
+    "model": {
+        "bias": true,
+        "dim_q": 128,
+        "dim_kv": 192,
+        "n_classes": 28,
+        "n_heads": 1,
+        "input_shape": [1, 8, 16, 16, 768]
+    }
+}

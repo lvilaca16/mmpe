@@ -1,0 +1,30 @@
+{
+    "batch_size": 8,
+    "clip_value": 10,
+    "num_epochs": 120,
+    "num_workers": 4,
+    "prefetch_factor": 32,
+    "seed": 1234,
+    "data": {
+        "channels_last": true,
+        "path": "data/cifar100/",
+        "resolution": 28
+    },
+    "logging": {
+        "entity": "",
+        "name": "",
+        "project": ""
+    },
+    "optim": {
+        "fused": true,
+        "lr": 1e-3
+    },
+    "model": {
+        "bias": true,
+        "dim_q": 128,
+        "dim_kv": 128,
+        "n_classes": 100,
+        "n_heads": 1,
+        "input_shape": [1, 224, 224, 3]
+    }
+}
