@@ -18,7 +18,7 @@ Dataloaders and positional encoding layers for multimodal resampling models.
 ## Installation
 
 ```bash
-git clone https://github.com/<your-username>/mropes.git
+git clone https://github.com/lvilaca16/mropes.git
 cd mropes
 pip install -e .
 ```
