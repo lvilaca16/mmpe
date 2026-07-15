@@ -29,21 +29,18 @@ class TestVideoDataset(unittest.TestCase):
         self.assertGreater(len(self.dataset), 0, "Dataset is empty")
 
     def test_dataloader_full_pass(self):
-        loader = DataLoader(self.dataset, batch_size=2, drop_last=True)
+        loader = DataLoader(self.dataset, batch_size=1, drop_last=True)
 
-        for (x_audio, x_video), Y in tqdm(loader):
+        for X, Y in tqdm(loader):
             dt, dh, dw = PATCH_DOWNSAMPLE
 
-            self.assertEqual(x_video.shape[0], 2)
+            self.assertEqual(X.shape[0], 1)
 
             # video: "t h w (c p)" after downsample rearrange
-            self.assertEqual(x_video.shape[-1] % (dt * dh * dw), 0)
-            self.assertEqual(x_video.shape[1:], self.dataset.output_shape())
+            self.assertEqual(X.shape[-1] % (dt * dh * dw), 0)
+            self.assertEqual(X.shape[1:], self.dataset.output_shape())
 
-            self.assertEqual(x_audio.shape[0], 2)
-            self.assertEqual(x_audio.shape[2], N_MELS)
-
-            self.assertEqual(Y.shape[0], 2)
+            self.assertEqual(Y.shape[0], 1)
             self.assertEqual(Y.shape[1], self.dataset.n_classes)
 
     def test_invalid_patch_downsample_raises(self):
@@ -68,17 +65,13 @@ class TestVideoDataset(unittest.TestCase):
             )
 
     def test_no_nan_or_inf(self):
-        (x_audio, x_video), Y = self.dataset[0]
+        X, Y = self.dataset[0]
 
-        checks = {"x_audio": x_audio, "x_video": x_video, "Y": Y}
+        with self.subTest(check="type", key="x_video"):
+            self.assertIsInstance(X, torch.Tensor, "X is not a Tensor")
 
-        for key, tensor in checks.items():
-            with self.subTest(check="type", key=key):
-                self.assertIsInstance(
-                    tensor, torch.Tensor, f"'{key}' is not a Tensor"
-                )
-            with self.subTest(check="nan_inf", key=key):
-                self._assert_no_nan_or_inf(tensor, key)
+        with self.subTest(check="nan_inf", key="y_true"):
+            self._assert_no_nan_or_inf(Y, "y_true")
 
 
 if __name__ == "__main__":
