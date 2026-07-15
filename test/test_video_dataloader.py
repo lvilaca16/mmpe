@@ -7,7 +7,7 @@ from tqdm import tqdm
 
 from src.loader import get_dataset, VideoDataset
 
-DATA_PATH = Path("data/ave")
+DATA_PATH = Path("data/video")
 RESOLUTION = 224
 PATCH_DOWNSAMPLE = [2, 8, 8]
 N_MELS = 64
@@ -18,7 +18,7 @@ class TestVideoDataset(unittest.TestCase):
     def setUp(self):
         kwargs = {
             "path": DATA_PATH,
-            "split": "train",
+            "split": "test",
             "resolution": RESOLUTION,
             "downsample": PATCH_DOWNSAMPLE,
         }
@@ -54,7 +54,7 @@ class TestVideoDataset(unittest.TestCase):
         with self.assertRaises((FileNotFoundError, IndexError)):
             # force an out-of-range access if dataset supports it; otherwise
             # this documents expected behavior for a corrupted file list
-            bad_dataset = VideoDataset(DATA_PATH, split="train")
+            bad_dataset = VideoDataset(DATA_PATH, split="test")
             bad_dataset.files = ["nonexistent/path/video.mp4"]
             bad_dataset[0]
 
