@@ -15,6 +15,16 @@ from torchvision.transforms import Compose, Lambda
 
 from .utils import pad_along_axis
 
+import functools
+
+
+def _spec_rearrange(x):
+    return rearrange(x, "c f t -> t (c f)")
+
+
+def _raw_rearrange(x, ds):
+    return rearrange(x, "c (t ds) -> t c ds", ds=ds).squeeze(1)
+
 
 @dataclass
 class AudioConfig:
@@ -65,13 +75,13 @@ class AudioDataset(torch.utils.data.Dataset):
                         n_mels=self.audio.n_mels,
                     ),
                     T.AmplitudeToDB(),
-                    Lambda(lambda x: rearrange(x, "c f t -> t (c f)")),
+                    Lambda(_spec_rearrange),
                 ]
             )
 
         elif self.audio.preprocessing == "raw":
             self.transform = Lambda(
-                lambda x: rearrange(x, "(t ds) -> t ds", ds=self.audio.dim)
+                functools.partial(_raw_rearrange, ds=self.audio.dim)
             )
 
         else:
