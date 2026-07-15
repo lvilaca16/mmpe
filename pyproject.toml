@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mropes"
+version = "0.1.0"
+description = "Dataloaders and positional encoding layers for multimodal resampling models."
+readme = "README.md"
+license = { text = "CC-BY-NC-SA-4.0" }
+requires-python = ">=3.9"
+dependencies = [
+    "torch",
+    "torchaudio",
+    "torchvision",
+    "einops",
+    "numpy",
+    "Pillow",
+]
+
+[project.optional-dependencies]
+dev = []
+
+[tool.setuptools.packages.find]
+where = ["src"]
