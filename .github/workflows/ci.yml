@@ -7,30 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  test-position:
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        python-version: ["3.10", "3.11", "3.12"]
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-          cache: "pip"
-
-      - name: Install package
-        run: pip install -e .
-
-      - name: Run positional encoding tests
-        run: python -m unittest discover -s test/position
-
-  test-loader:
+  unit-tests:
     runs-on: ubuntu-latest
 
     strategy:
@@ -52,6 +29,9 @@ jobs:
 
       - name: Install package
         run: pip install -e .
+
+      - name: Run positional encoding tests
+        run: python -m unittest discover -s test/position
 
       - name: Run dataloader tests
         run: python -m unittest discover -s test/loader

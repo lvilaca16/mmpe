@@ -1,8 +1,8 @@
 # mropes
 
 [![CC BY-NC-SA 4.0][cc-by-nc-sa-shield]][cc-by-nc-sa]
-[![Positional Encoding Tests][pe-tests-shield]][ci-workflow]
-[![Dataloader Tests][loader-tests-shield]][ci-workflow]
+[![Tests][tests-shield]][ci-workflow]
+
 
 Dataloaders and positional encoding layers for multimodal resampling models.
 
@@ -112,6 +112,5 @@ Any feedback is appreciated. If you observed any issues, please get in touch wit
 [cc-by-nc-sa]: http://creativecommons.org/licenses/by-nc-sa/4.0/
 [cc-by-nc-sa-image]: https://licensebuttons.net/l/by-nc-sa/4.0/88x31.png
 [cc-by-nc-sa-shield]: https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg
-[pe-tests-shield]: https://github.com/lvilaca16/mmpe/actions/workflows/ci.yml/badge.svg?branch=main&event=push&job=test-position
-[loader-tests-shield]: https://github.com/lvilaca16/mmpe/actions/workflows/ci.yml/badge.svg?branch=main&event=push&job=test-loader
+[tests-shield]: https://github.com/lvilaca16/mmpe/actions/workflows/ci.yml/badge.svg?branch=main
 [ci-workflow]: https://github.com/lvilaca16/mmpe/actions/workflows/ci.yml
