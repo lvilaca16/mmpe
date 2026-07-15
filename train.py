@@ -150,7 +150,10 @@ def main(args: argparse.Namespace, config: dict) -> None:
             with autocast(**autocast_factory):
                 Y_pred = model(X)
 
-            loss = F.cross_entropy(Y_pred, Y_true)
+                if args.bce:
+                    loss = F.binary_cross_entropy_with_logits(Y_pred, Y_true)
+                else:
+                    loss = F.cross_entropy(Y_pred, Y_true)
 
             scaler.scale(loss).backward()
 
@@ -182,7 +185,12 @@ def main(args: argparse.Namespace, config: dict) -> None:
                 with autocast(**autocast_factory):
                     Y_pred = model(X)
 
-                    loss = F.cross_entropy(Y_pred, Y_true)
+                    if args.bce:
+                        loss = F.binary_cross_entropy_with_logits(
+                            Y_pred, Y_true
+                        )
+                    else:
+                        loss = F.cross_entropy(Y_pred, Y_true)
 
                 v_acc1, v_acc5 = accuracy(Y_pred, Y_true, topk=(1, 5))
 
@@ -240,6 +248,7 @@ def main(args: argparse.Namespace, config: dict) -> None:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument("--bce", action="store_true")
     parser.add_argument("--clip", action="store_true")
     parser.add_argument("--config", type=Path, required=True)
     parser.add_argument("--debug", action="store_true")
