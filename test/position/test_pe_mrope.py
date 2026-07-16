@@ -2,7 +2,7 @@ import unittest
 
 import torch
 
-from src.position import MRoPE
+from mropes.position import MRoPE
 
 
 class TestMRoPE(unittest.TestCase):

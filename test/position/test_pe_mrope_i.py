@@ -2,7 +2,7 @@ import unittest
 
 import torch
 
-from src.position import MRoPEInterleave
+from mropes.position import MRoPEInterleave
 
 
 class TestMRoPEInterleave(unittest.TestCase):

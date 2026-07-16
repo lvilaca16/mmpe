@@ -1,6 +1,6 @@
 import unittest
 
-from src.position import (
+from mropes.position import (
     FourierPE,
     get_positional_encoding,
     MRoPE,

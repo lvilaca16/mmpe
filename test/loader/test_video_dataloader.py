@@ -4,7 +4,7 @@ from pathlib import Path
 import torch
 from torch.utils.data import DataLoader
 
-from src.loader import get_dataset, VideoDataset
+from mropes.loader import get_dataset, VideoDataset
 
 FIXTURES = Path(__file__).parent / "fixtures" / "video"
 

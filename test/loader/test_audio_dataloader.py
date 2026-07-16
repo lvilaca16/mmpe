@@ -4,7 +4,7 @@ from pathlib import Path
 import torch
 from torch.utils.data import DataLoader
 
-from src.loader import get_dataset, AudioDataset
+from mropes.loader import get_dataset, AudioDataset
 
 FIXTURES = Path(__file__).parent / "fixtures" / "audio"
 

@@ -2,7 +2,7 @@ import unittest
 
 import torch
 
-from src.position import RoPE
+from mropes.position import RoPE
 
 
 class TestRotaryPositionEmbedding(unittest.TestCase):

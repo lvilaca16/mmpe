@@ -2,7 +2,7 @@ import unittest
 
 import torch
 
-from src.position import FourierPE
+from mropes.position import FourierPE
 
 
 class TestFourierPositionalEncoding(unittest.TestCase):
