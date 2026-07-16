@@ -23,26 +23,6 @@ cd mropes
 pip install -e .
 ```
 
-## Testing
-
-Tests use the standard library `unittest` framework.
-
-```bash
-python -m unittest discover -s test
-```
-
-Run a specific test module:
-
-```bash
-python -m unittest test.loader.test_video
-```
-
-Run a specific test case or method:
-
-```bash
-python -m unittest test.loader.test_video.TestVideoDataset.test_output_shape
-```
-
 ## Dataloaders
 
 All datasets share a common factory interface:
@@ -56,6 +36,7 @@ read_fn = get_reader("video")   # -> get_video
 
 Supported types: `"audio"`, `"video"`, `"image"`.
 
+
 ### Available Datasets
 
 | Dataset | Config | Input format | Output shape | Notes |
@@ -68,6 +49,7 @@ All three datasets expose `output_shape()`, so positional encoding layers and
 downstream models can be sized directly from real data rather than hardcoded
 config.
 
+See [`src/loader/README.md`](src/loader/README.md) for full details.
 
 ### Pre-processing Scripts
 
@@ -96,6 +78,7 @@ pos_enc.output_shape(axes)   # -> shape after encoding, given input axis shape
 kv = pos_enc(x)                # x: [batch, *axes, dim]
 ```
 
+
 ### Available Positional Encodings
 
 | `pe_type` | Output dim         | Input shape                | Notes |
@@ -105,7 +88,17 @@ kv = pos_enc(x)                # x: [batch, *axes, dim]
 | `mrope_i` | `dim` (unchanged)   | `[batch, *axes, dim]` | Round-robin interleaved frequency allocation across axes — full spectrum per axis. |
 | `fourier` | expanded            | `[batch, *axes, dim]` | Fixed sinusoidal features, independent of `dim`; see below. |
 
-> **For more detail go to [src/position](src/position)**.
+See [`src/position/README.md`](src/position/README.md) for full details.
+
+
+## Testing
+
+Tests use the standard library `unittest` framework.
+
+```bash
+python -m unittest discover -s test
+```
+
 
 ## Citations
 
