@@ -1,0 +1,15 @@
+black
+calflops
+einops
+flake8
+isort
+matplotlib
+numpy
+pillow
+torch
+torchaudio
+torchcodec
+torchinfo
+torchvision
+tqdm
+wandb
