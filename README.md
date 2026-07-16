@@ -68,7 +68,20 @@ All three datasets expose `output_shape()`, so positional encoding layers and
 downstream models can be sized directly from real data rather than hardcoded
 config.
 
-> **For more detail go to [src/loader](src/loader)**.
+
+### Pre-processing Scripts
+
+Before use with `mropes.loader`, raw audio and video files need to be
+converted into the formats `AudioDataset` and `VideoDataset` expect.
+Bash helpers for this live in [`scripts/`](scripts):
+
+```bash
+./scripts/audio.sh path/to/sample.wav   # convert to mono, 16-bit PCM, 48kHz (in place)
+./scripts/video.sh path/to/sample.mp4   # extract 32 evenly spaced frames into sample/
+```
+
+See [`scripts/README.md`](scripts/README.md) for full details, requirements,
+and batch usage.
 
 ## Positional Encoding Layers
 
