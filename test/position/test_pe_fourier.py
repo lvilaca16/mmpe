@@ -9,7 +9,8 @@ class TestFourierPositionalEncoding(unittest.TestCase):
 
     def setUp(self):
         self.n_bands = 4
-        self.module = FourierPE(3, n_bands=self.n_bands)
+        self.stack = False
+        self.module = FourierPE(3, n_bands=self.n_bands, stack=self.stack)
 
     def test_output_shape_matches_declared_output_shape(self):
         x = torch.rand(2, 3, 4, 5, 2)
