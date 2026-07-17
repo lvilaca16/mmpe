@@ -63,18 +63,8 @@ class FourierPE(nn.Module):
 
         encodings = []
 
-        encodings.extend(
-            [
-                torch.sin(torch.pi * frequency_grid)
-                for frequency_grid in frequencies
-            ]
-        )
-        encodings.extend(
-            [
-                torch.cos(torch.pi * frequency_grid)
-                for frequency_grid in frequencies
-            ]
-        )
+        encodings.extend([torch.sin(torch.pi * grid) for grid in frequencies])
+        encodings.extend([torch.cos(torch.pi * grid) for grid in frequencies])
 
         encodings = torch.cat(encodings, dim=-1)
 
