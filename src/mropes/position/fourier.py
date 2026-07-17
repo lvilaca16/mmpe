@@ -80,9 +80,9 @@ class FourierPE(nn.Module):
         return encodings
 
     def output_shape(self, shape: Tuple[int]) -> Tuple[int]:
-        if self.stack:
-            return torch.Size(
-                (*shape, self.dim + len(shape) * (2 * self.n_bands))
-            )
+        channel_dim = len(shape) * (2 * self.n_bands)
 
-        return torch.Size((*shape, len(shape) * (2 * self.n_bands)))
+        if self.stack:
+            channel_dim += self.dim
+
+        return torch.Size((*shape, channel_dim))
