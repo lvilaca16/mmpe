@@ -72,10 +72,7 @@ class FourierPE(nn.Module):
         encodings = repeat(encodings, "... -> b ...", b=b)
 
         if self.stack:
-            # concat position to data
-            encoded_data = torch.cat((x, encodings), dim=-1)
-
-            return encoded_data
+            return torch.cat((x, encodings), dim=-1)
 
         return encodings
 
