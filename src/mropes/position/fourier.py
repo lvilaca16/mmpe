@@ -32,6 +32,9 @@ class FourierPE(nn.Module):
             torch.meshgrid(*coords, indexing="ij"), dim=len(shape)
         )
 
+    def _get_frequencies(self, v_max, **kwargs):
+        return torch.linspace(1.0, v_max / 2.0, self.n_bands, **kwargs)
+
     def forward(self, x: torch.Tensor, return_frequency: bool = False):
         b, *axes, _ = x.shape
         args = {"device": x.device, "dtype": x.dtype}
@@ -39,9 +42,7 @@ class FourierPE(nn.Module):
         # list of positions for each axis [-1 to 1]
         pos = self._get_positions(axes, v_min=0, v_max=1, **args)
 
-        freq = [
-            torch.linspace(1.0, ax / 2.0, self.n_bands, **args) for ax in axes
-        ]
+        freq = [self._get_frequencies(ax, **args) for ax in axes]
         freq = torch.stack(freq, -1)
 
         # Get frequencies
