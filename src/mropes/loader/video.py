@@ -1,5 +1,4 @@
 import math
-import os
 from dataclasses import dataclass, field, replace
 from glob import glob
 from pathlib import Path
@@ -53,10 +52,8 @@ class VideoDataset(torch.utils.data.Dataset):
         # labels are the folders on the first level
         self.files = glob(str(path / f"**/*.{self.video.extension}"))
 
-        self.label_map = {x: i for i, x in enumerate(os.listdir(path))}
-        self.n_classes = len(self.label_map)
-
         self.label_map = build_label_map(path.parent)
+        self.n_classes = len(self.label_map)
 
         # video properties
         assert len(self.video.downsample) == 3, "invalid downsample config."
