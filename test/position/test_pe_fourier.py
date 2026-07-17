@@ -37,7 +37,7 @@ class TestFourierPositionalEncoding(unittest.TestCase):
         x = torch.rand(2, 6, 7, 3)
         out = self.module(x)
         num_axes = len(x.shape[1:-1])
-        self.assertEqual(out.shape[-1], num_axes * 2 * self.n_bands)
+        self.assertEqual(out.shape[-1], num_axes * 2 * self.n_bands + num_axes)
 
     def test_values_are_bounded(self):
         # Output is built entirely from sin/cos, so must lie in [-1, 1].

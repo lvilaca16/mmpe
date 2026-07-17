@@ -17,12 +17,19 @@ class FourierPE(nn.Module):
     width grows linearly with the number of axes.
     """
 
-    def __init__(self, dim: int, n_bands: int = 64, stack: bool = False):
+    def __init__(
+        self,
+        dim: int,
+        n_bands: int = 64,
+        stack: bool = False,
+        add_position: bool = True,
+    ):
         super().__init__()
 
         self.dim = dim
         self.n_bands = n_bands
         self.stack = stack
+        self.add_position = add_position
 
     def _get_positions(self, shape, v_min=0, v_max=1.0, **kwargs):
         coords = [
@@ -70,6 +77,10 @@ class FourierPE(nn.Module):
         )
 
         encodings = torch.cat(encodings, dim=-1)
+
+        if self.add_position:
+            encodings = torch.cat((pos, encodings), dim=-1)
+
         encodings = repeat(encodings, "... -> b ...", b=b)
 
         if self.stack:
@@ -78,7 +89,7 @@ class FourierPE(nn.Module):
         return encodings
 
     def output_shape(self, shape: Tuple[int]) -> Tuple[int]:
-        channel_dim = len(shape) * (2 * self.n_bands)
+        channel_dim = len(shape) * (2 * self.n_bands) + len(shape)
 
         if self.stack:
             channel_dim += self.dim
