@@ -125,16 +125,13 @@ class Model(nn.Module):
     def forward(self, x_kv: torch.Tensor) -> torch.Tensor:
         b = x_kv.shape[0]
 
-        # [batch, tokens, dim_kv]
         with profiler.record_function("attention/pre-processing"):
-            kv = self.channel_projection(x_kv)
+            kv = self.channel_projection(x_kv)  # (b, *axis, d)
 
-        # [batch, tokens, pe_size]
         with profiler.record_function("attention/positional-encoding"):
-            kv = self.pos_enc(kv)
-            kv = rearrange(kv, "b ... c -> b (...) c")  # to sequence
+            kv = self.pos_enc(kv)  # (b, *axis, d)
+            kv = rearrange(kv, "b ... c -> b (...) c")  # (b, t, d)
 
-        # Get Latent array
         with profiler.record_function("latent-array"):
             x_latent = repeat(self.latent_query, "n d -> b n d", b=b)
 
