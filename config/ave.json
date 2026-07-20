@@ -1,24 +1,24 @@
 {
     "batch_size": 8,
     "clip_value": 10,
-    "num_epochs": 120,
-    "num_workers": 4,
+    "num_epochs": 25,
+    "num_workers": 16,
     "prefetch_factor": 32,
     "seed": 1234,
     "data": {
         "downsample": [4, 8, 8],
         "n_samples": 32,
         "path": "data/ave/",
-        "resolution": 128
+        "resolution": 224
     },
     "logging": {
         "entity": "",
-        "name": "",
+        "name": "ave",
         "project": ""
     },
     "optim": {
         "fused": true,
-        "lr": 1e-3
+        "lr": 3e-4
     },
     "model": {
         "bias": true,
@@ -26,6 +26,6 @@
         "dim_kv": 192,
         "n_classes": 28,
         "n_heads": 1,
-        "input_shape": [1, 8, 16, 16, 768]
+        "input_shape": [1, 8, 28, 28, 768]
     }
 }

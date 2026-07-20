@@ -1,23 +1,23 @@
 {
     "batch_size": 8,
     "clip_value": 10,
-    "num_epochs": 120,
-    "num_workers": 4,
+    "num_epochs": 25,
+    "num_workers": 16,
     "prefetch_factor": 32,
     "seed": 1234,
     "data": {
         "channels_last": true,
         "path": "data/cifar100/",
-        "resolution": 28
+        "resolution": 224
     },
     "logging": {
         "entity": "",
-        "name": "",
+        "name": "cifar100",
         "project": ""
     },
     "optim": {
         "fused": true,
-        "lr": 1e-3
+        "lr": 3e-4
     },
     "model": {
         "bias": true,
