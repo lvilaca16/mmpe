@@ -50,9 +50,6 @@ class MRoPE(nn.Module):
 
         n_pairs = d // (n_axes * 2)
 
-        freq_idx = torch.arange(0, n_pairs, **args)
-        theta = 1.0 / (self.base ** (2 * freq_idx / d))
-
         pos = self.get_positions(axes, **args)
 
         pos_flat = rearrange(pos, "... d -> (...) d")  # (seq, n_axes)
@@ -66,6 +63,9 @@ class MRoPE(nn.Module):
             thetas = []
 
         for i in range(len(axes)):
+            freq_idx = torch.arange(i * n_pairs, (i + 1) * n_pairs, **args)
+            theta = 1.0 / (self.base ** (2 * freq_idx / d))
+
             ang = torch.einsum("n,k->nk", pos_flat[:, i], theta)  # (seq, ki)
 
             if return_theta:
