@@ -6,7 +6,7 @@ import torch.autograd.profiler as profiler
 import torch.nn as nn
 from einops import rearrange, repeat
 
-from .position import SUPPORT_TYPES, get_positional_encoding
+from mropes.position import SUPPORT_TYPES, get_positional_encoding
 
 
 class Attention(nn.Module):
