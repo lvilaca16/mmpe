@@ -1,0 +1,36 @@
+{
+    "batch_size": 8,
+    "clip_value": 10,
+    "num_epochs": 25,
+    "num_workers": 16,
+    "prefetch_factor": 32,
+    "seed": 1234,
+    "data": {
+        "dim": 128,
+        "hop_length": 512,
+        "length": 5,
+        "n_classes": 50,
+        "n_fft": 1024,
+        "n_mels": 64,
+        "path": "data/esc50/",
+        "preprocessing": "spec",
+        "sr": 48000
+    },
+    "logging": {
+        "entity": "",
+        "name": "esc50",
+        "project": ""
+    },
+    "optim": {
+        "fused": true,
+        "lr": 3e-4
+    },
+    "model": {
+        "bias": true,
+        "dim_q": 128,
+        "dim_kv": 128,
+        "n_classes": 50,
+        "n_heads": 1,
+        "input_shape": [1, 469, 64]
+    }
+}
