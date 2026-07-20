@@ -139,6 +139,8 @@ class Model(nn.Module):
             x_latent = repeat(self.latent_query, "n d -> b n d", b=b)
 
         with profiler.record_function("attention"):
-            x_attn = self.att(x_latent, kv).squeeze(dim=1)
+            x_attn = self.att(x_latent, kv)
+            x_attn = x_attn + x_latent
+            x_attn = x_attn.squeeze(dim=1)  # residual
 
         return self.to_logits(x_attn)
