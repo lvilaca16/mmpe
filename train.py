@@ -14,7 +14,7 @@ from torchinfo import summary
 from tqdm import tqdm, trange
 
 import wandb
-from src.loader import get_dataset
+from mropes.loader import get_dataset
 from src.model import Model
 from src.utils import (
     AverageMeter,
