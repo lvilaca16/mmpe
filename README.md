@@ -23,6 +23,8 @@ cd mropes
 pip install -e .
 ```
 
+These installation steps assume that FFMPEG (4.2.2) is already installed. Please check the official installation instruction on [trac.ffmpeg.org](https://trac.ffmpeg.org/) or use `conda` to install it within the virtual environment: `conda install ffmpeg=4.2.2`.
+
 ## Dataloaders
 
 All datasets share a common factory interface:
@@ -45,17 +47,15 @@ Supported types: `"audio"`, `"video"`, `"image"`.
 | `VideoDataset` | `VideoConfig` | Pre-extracted frames in `path/<split>/<class>/<video_name>/*` | `(t_out, h_out, w_out, c*dt*dh*dw)` | Resize, center-crop, normalize, then temporal-spatial downsampling folds patches into the channel dim. Train-time horizontal flip and frame dropout. |
 | `ImageDataset` | `ImageConfig` | `path/<split>/<class>/*` | `(h, w, 3)` or `(3, h, w)` (`channels_last`) | Distinct train (`RandomResizedCrop`, `RandomHorizontalFlip`, `RandAugment`) and eval (`CenterCrop`) pipelines. |
 
-All three datasets expose `output_shape()`, so positional encoding layers and
-downstream models can be sized directly from real data rather than hardcoded
-config.
+All three datasets expose `output_shape()`, so positional encoding layers and downstream models can be sized directly from real data rather than hardcoded config.
 
 See [`src/loader/README.md`](src/loader/README.md) for full details.
 
 ### Pre-processing Scripts
 
-Before use with `mropes.loader`, raw audio and video files need to be
-converted into the formats `AudioDataset` and `VideoDataset` expect.
-Bash helpers for this live in [`scripts/`](scripts):
+Before using `mropes.loader`, raw audio and video files must be converted into the formats expected by `AudioDataset` and `VideoDataset`.
+Bash helpers for this process live in [`scripts/`](scripts):
+
 
 ```bash
 ./scripts/audio.sh path/to/sample.wav   # convert to mono, 16-bit PCM, 48kHz (in place)
