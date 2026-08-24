@@ -273,6 +273,9 @@ if __name__ == "__main__":
     parser.add_argument("--verbose", action="store_true")
 
     # Model-related
+    parser.add_argument("--stack", action="store_true")
+    parser.add_argument("--n_bands", default=64, type=int)
+
     parser.add_argument(
         "--pe_variant",
         type=str,
@@ -289,6 +292,12 @@ if __name__ == "__main__":
 
     # Add for model building
     config["model"]["pe_type"] = args.pe_variant
+
+    if args.n_bands != 64:
+        config["model"]["n_bands"] = args.n_bands
+
+    if args.stack:
+        config["model"]["stack"] = args.stack
 
     try:
         main(args, config)
