@@ -73,14 +73,6 @@ class VideoDataset(torch.utils.data.Dataset):
                 Resize(resize_shape),
                 CenterCrop(self.video.resolution),
                 Normalize(mean=MEAN, std=STD),
-                Lambda(
-                    functools.partial(
-                        _rearrange_downsample,
-                        dt=self.video.downsample[0],
-                        dh=self.video.downsample[1],
-                        dw=self.video.downsample[2],
-                    )
-                ),
                 (
                     Lambda(functools.partial(_hflip, p=0.5))
                     if split == "train"
@@ -90,6 +82,14 @@ class VideoDataset(torch.utils.data.Dataset):
                     Lambda(functools.partial(_dropout, p=0.2))
                     if split == "train"
                     else bypass
+                ),
+                Lambda(
+                    functools.partial(
+                        _rearrange_downsample,
+                        dt=self.video.downsample[0],
+                        dh=self.video.downsample[1],
+                        dw=self.video.downsample[2],
+                    )
                 ),
                 Lambda(_rearrange_final),
             ]
