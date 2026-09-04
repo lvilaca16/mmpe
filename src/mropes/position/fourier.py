@@ -21,7 +21,7 @@ class FourierPE(nn.Module):
         self,
         dim: int,
         n_bands: int = 64,
-        stack: bool = False,
+        stack: bool = True,
         add_position: bool = True,
     ):
         super().__init__()
