@@ -59,29 +59,26 @@ class MRoPE(nn.Module):
         cos = torch.zeros((n_axes, seq_len, d // n_axes), **args)
         sin = torch.zeros((n_axes, seq_len, d // n_axes), **args)
 
-        if return_theta:
-            thetas = []
+        # if return_theta:
+        thetas = []
+
+        # ang_chunks = []
 
         for i in range(len(axes)):
             freq_idx = torch.arange(i * n_pairs, (i + 1) * n_pairs, **args)
             theta = 1.0 / (self.base ** (2 * freq_idx / d))
 
-            ang = torch.einsum("n,k->nk", pos_flat[:, i], theta)  # (seq, ki)
-
-            if return_theta:
-                thetas.append(ang)
-                continue
-
-            ang = torch.cat([ang, ang], dim=-1)  # (T, D)
-
-            cos[i] = ang.cos()
-            sin[i] = ang.sin()
+            ang_i = torch.einsum("n,k->nk", pos_flat[:, i], theta)  # (seq, ki)
+            thetas.append(ang_i)
 
         if return_theta:
             return torch.stack(thetas)
 
-        cos = rearrange(cos, "n t d -> t (n d)")
-        sin = rearrange(sin, "n t d -> t (n d)")
+        # (seq, d/2) -- contiguous per-axis
+        ang = torch.cat(thetas, dim=-1)  # (T, D/2)
+
+        cos = torch.cat([ang.cos(), ang.cos()], dim=-1)
+        sin = torch.cat([ang.sin(), ang.sin()], dim=-1)
 
         x_rope = (x_flat * cos) + (self.rotate_half(x_flat) * sin)
 
