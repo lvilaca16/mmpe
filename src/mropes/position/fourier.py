@@ -81,7 +81,4 @@ class FourierPE(nn.Module):
     def output_shape(self, shape: Tuple[int]) -> Tuple[int]:
         channel_dim = len(shape) * (2 * self.n_bands) + len(shape)
 
-        if self.stack:
-            channel_dim += self.dim
-
         return torch.Size((*shape, channel_dim))
