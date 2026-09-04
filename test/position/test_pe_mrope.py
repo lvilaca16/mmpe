@@ -8,7 +8,7 @@ from mropes.position import MRoPE
 class TestMRoPE(unittest.TestCase):
 
     def setUp(self):
-        self.dim = 32
+        self.dim = 24
         self.module = MRoPE(self.dim)
 
     def test_output_shape_grows_with_num_axes(self):
@@ -74,6 +74,25 @@ class TestMRoPE(unittest.TestCase):
         out = module(x)
 
         self.assertEqual(out.shape, (1, 5, self.dim))  # 1 axis -> no growth
+
+    def test_rotation_preserves_norm(self):
+        torch.manual_seed(0)
+
+        x = torch.rand(2, 3, 4, 5, self.dim)
+        x_rope = self.module(x)
+
+        norm_before = x.norm(dim=-1)
+        norm_after = x_rope.norm(dim=-1)
+
+        torch.testing.assert_close(
+            norm_after, norm_before, rtol=1e-4, atol=1e-4
+        )
+
+    def test_zero_position_is_identity(self):
+        x = torch.randn(1, 1, 1, self.dim)
+        x_rope = self.module(x)
+
+        torch.testing.assert_close(x_rope, x, rtol=1e-6, atol=1e-6)
 
 
 if __name__ == "__main__":
