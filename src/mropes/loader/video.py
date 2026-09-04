@@ -28,6 +28,7 @@ class VideoConfig:
     n_samples: int = 32
     downsample: List[int] = field(default_factory=lambda: [2, 8, 8])
     extension: str = "mp4"
+    channels_last: bool = True
 
 
 class VideoDataset(torch.utils.data.Dataset):
@@ -124,6 +125,9 @@ class VideoDataset(torch.utils.data.Dataset):
         if self.v_transform is not None:
             x_video = self.v_transform(x_video)
 
+        if self.video.channels_last:
+            return x_video.permute(0, 2, 3, 1), Y
+
         return x_video, Y
 
 
@@ -180,4 +184,4 @@ def _dropout(x, p):
 
 
 def _rearrange_final(x):
-    return rearrange(x, "t p c h w -> t h w (c p)")
+    return rearrange(x, "t p c h w -> t (p c) h w")
