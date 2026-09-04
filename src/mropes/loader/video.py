@@ -19,7 +19,7 @@ from torchvision.transforms import (
 )
 
 from .image import MEAN, STD, get_image
-from .utils import build_label_map, video_dropout, video_hflip
+from .utils import build_label_map, frame_dropout, video_hflip
 
 
 @dataclass
@@ -180,7 +180,7 @@ def _hflip(x, p):
 
 
 def _dropout(x, p):
-    return video_dropout(x, p=p)
+    return frame_dropout(x, p=p)
 
 
 def _rearrange_final(x):

@@ -34,9 +34,9 @@ def build_label_map(
     return {cls_name: idx for idx, cls_name in enumerate(sorted_classes)}
 
 
-def video_dropout(x: torch.Tensor, p: float = 0.3) -> torch.Tensor:
+def frame_dropout(x: torch.Tensor, p: float = 0.3) -> torch.Tensor:
     """
-    Dropout video frames.
+    Dropout individual video frames (temporal dropout).
 
     Arguments:
         x -- video tensor
@@ -45,10 +45,12 @@ def video_dropout(x: torch.Tensor, p: float = 0.3) -> torch.Tensor:
     Returns:
         Dropped video tensor
     """
-    if torch.rand(1) <= p:
-        return torch.zeros(x.shape)
+    t = x.shape[0]
 
-    return x
+    keep_mask = (torch.rand(t, device=x.device) > p).float()
+    keep_mask = keep_mask.view(t, *([1] * (x.dim() - 1)))
+
+    return x * keep_mask
 
 
 def video_hflip(x: torch.Tensor, p: float = 0.5) -> torch.Tensor:
