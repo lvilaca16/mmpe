@@ -149,11 +149,15 @@ def get_video(path: Path, n_frames: int = 32) -> torch.Tensor:
     frames_path = path.parent / f"{path.stem}/*"
     frames_path = sorted(glob(frames_path.as_posix()))
 
-    frames = [get_image(x) for x in frames_path]
-
     assert (
-        len(frames) >= n_frames
-    ), f"Invalid amount of frames ({len(frames)}/{n_frames})"
+        len(frames_path) >= n_frames
+    ), f"Invalid amount of frames ({len(frames_path)}/{n_frames})"
+
+    # pick n_frames evenly spaced indices among the available frames
+    indices = np.linspace(0, len(frames_path) - 1, n_frames).round().astype(int)
+    frames_path = [frames_path[i] for i in indices]
+
+    frames = [get_image(x) for x in frames_path]
 
     frames = np.stack(frames)
     frames = torch.from_numpy(frames).permute(0, 3, 1, 2)  # channels first
